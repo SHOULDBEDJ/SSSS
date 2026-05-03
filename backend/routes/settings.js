@@ -5,7 +5,8 @@ import {
 } from '../controllers/settingsController.js';
 
 const router = Router();
-const upload = multer({ dest: 'temp_uploads/' });
+const uploadDir = process.env.VERCEL ? '/tmp' : 'temp_uploads/';
+const upload = multer({ dest: uploadDir });
 
 router.get('/kpi-config', getKpiConfig);
 router.put('/kpi-config', updateKpiConfig);
