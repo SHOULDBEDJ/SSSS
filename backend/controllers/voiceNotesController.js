@@ -7,12 +7,20 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadDir = path.join(__dirname, '../uploads/voice_notes');
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    const targetDir = process.env.VERCEL ? '/tmp' : uploadDir;
+    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+  }
+} catch (e) {
+  console.log('Voice notes directory check skipped');
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    const targetDir = process.env.VERCEL ? '/tmp' : uploadDir;
+    cb(null, targetDir);
+  },
   filename: (req, file, cb) => {
     const unique = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     cb(null, `${unique}.webm`);
